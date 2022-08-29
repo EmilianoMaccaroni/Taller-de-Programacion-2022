@@ -1,0 +1,125 @@
+program E3P1;
+const
+	dimF= 8;
+type
+	rango1= 1..dimF;
+	pelicula= record
+		cod: integer;
+		genero: rango1;
+		puntaje: real;
+		end;
+	lista=^nodo;
+	nodo= record
+		dato: pelicula;
+		sig: lista;
+		end;
+	registroL= record
+		pri: lista;
+		ult: lista;
+		end;
+	vectorP= array [rango1] of pelicula;	
+	vectorL= array [rango1] of registroL;
+	
+procedure leerPelicula (var p: pelicula);
+begin
+	writeln ('ingresar codigo pelicula: ');
+	readln (p.cod);
+	if (p.cod <> -1) then begin
+		writeln ('ingresar genero pelicula: ');
+		readln (p.genero);
+		writeln ('ingresar puntaje pelicula: ');
+		readln (p.puntaje);
+		end;
+end;	
+procedure agregarEnLista (var pri, ult: lista; peli: pelicula);
+var nue: lista;
+begin
+	new (nue); nue^.dato:= peli; nue^.sig:= nil;
+	if (pri= nil) then begin
+		pri:= nue;
+		ult:= nue;
+		end
+	else
+		ult^.sig:= nue;
+	ult:= nue;
+end;
+
+procedure cargarVector (var vector: vectorL);
+var p: pelicula;
+begin
+	leerPelicula (p);
+	while (p.cod <> -1) do begin
+		agregarEnLista (vector[p.genero].pri, vector[p.genero].ult, p);
+		leerPelicula (p);
+	end;
+end;
+procedure inicializarVector (var vector: vectorL);
+var i: rango1;
+begin
+	for i:=1 to dimF do begin
+		vector [i].pri:= nil;
+		vector [i].ult:= nil;
+	end;
+end;
+
+procedure recorrerListai (pri: lista; var max: real; var pel: pelicula);
+begin
+	while (pri<> nil) do begin
+		if (pri^.dato.puntaje > max) then begin
+			max:= pri^.dato.puntaje;
+			pel:= pri^.dato;
+		end;
+		pri:= pri^.sig;
+	end;
+end;
+
+procedure iniciarVectorPuntaje (var v: vectorP);
+var i: rango1;
+begin
+	for i:=1 to dimF do v[i].puntaje:=0;
+end;
+
+procedure recorrerVector (var v: vectorL; var vec: vectorP);
+var i: rango1; max: real; pel: pelicula;
+begin
+	iniciarVectorPuntaje (vec);
+	for i:=1 to dimF do begin
+	max:=0;
+	recorrerListai (v[i].pri, max, pel);
+	vec[i]:= pel;
+	end;
+end;
+
+procedure Ordenar (var v: vectorP; dimL: rango1); {algoritmo de seleccion}
+
+var i, j, pos: rango1; item: pelicula;	
+		
+begin
+ for i:= 1 to dimL - 1 do 
+ begin {busca el mínimo y guarda en pos la posición}
+   pos := i;
+   for j := i+1 to dimL do 
+        if (v[j].puntaje< v[pos].puntaje) then pos:=j;
+
+   {intercambia v[i] y v[pos]}
+   item := v[pos];   
+   v[pos] := v[i];   
+   v[i] := item;
+ end;
+end;
+
+procedure imprimir (v: vectorP);
+begin
+	writeln ('el codigo de menor puntaje fue el: ', v[1].cod, ' con una puntuacion de: ', v[1].puntaje);
+	writeln ('el codigo de menor puntaje fue el: ', v[8].cod, ' con una puntuacion de: ', v[8].puntaje);
+end;
+
+var
+	v: vectorL; 
+	vec: vectorP;
+begin
+	inicializarVector (v);
+	cargarVector (v);
+	recorrerVector (v, vec);
+	imprimir (vec);
+end.
