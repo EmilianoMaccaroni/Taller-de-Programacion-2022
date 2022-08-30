@@ -1,0 +1,157 @@
+{
+Implementar un programa que procese la información de los participantes a un concurso de preguntas y respuestas (como máximo 20). 
+De cada participante se lee el código de participante y su edad. El ingreso de los participantes finaliza cuando se lee el código -1.
+a. Almacenar la información que se lee en un vector. 
+b. Mostrar la información almacenada.
+c. Ordenar el vector de participantes por edad.
+d. Mostrar el vector ordenado.
+e. Eliminar del vector ordenado los participantes con edades entre 20 y 22. 
+f. Mostrar el vector resultante.
+g. Generar una lista ordenada de menor a mayor con los participantes que quedaron el el vector después de realizar el inciso e.
+}
+
+program E;
+const dimF=20;
+
+type 
+	rango1= 1..dimF;
+	participante= record
+		codigo: integer;
+		edad: integer;
+		end;
+		
+	lista=^nodo;
+	nodo=record
+		dato: participante;
+		sig: lista;
+		end;
+	vector= array [rango1] of participante;
+		
+procedure leerParticipante (var p: participante);
+begin
+	readln (p.codigo);
+	if (p.codigo<>-1) then
+		readln (p.edad);
+end;
+
+procedure cargarVector (var v: vector; var dimL: integer); {carga del vector, jugando con la dimL}
+var p: participante;
+begin
+	leerParticipante (p);
+	dimL:=0;
+	while (p.codigo<>-1) and (dimL<dimF) do begin
+	dimL:= dimL+1;
+	v[dimL]:= p;
+	leerParticipante (p);
+	end;
+end;
+
+procedure leerVector (v: vector; dimL: integer);
+var i: rango1;
+begin
+	for i:=1 to dimL do begin
+		writeln ('el codigo es: ');
+		writeln (v[i].codigo);
+		writeln ('la edad es: ');
+		writeln (v[i].edad);
+	end;
+end;
+
+procedure inicializarVector (var v: vector);
+var i: rango1;
+begin 
+	for i:=1 to dimF do begin
+		v[i].codigo:=0;
+		v[i].edad:=0;
+		end;
+end;
+	
+procedure ordenarVector (var v: vector; dimL: integer); {con algoritmo de seleccion}
+var i,j,p: rango1;
+	item: participante;
+begin
+	for i:=1 to dimL-1 do begin
+		p:=i;;
+		for j:=i+1 to dimL do if (v[j].edad <  v[p].edad) then p:=j;
+		item:= v[p];
+		v[p]:= v[i];
+		v[i]:= item;
+	
+	end;
+end;
+
+procedure imprimirVector (v: vector; dimL: integer);
+var i: integer;
+begin
+	for i:=1 to dimL do begin
+		writeln (v[i].codigo);
+		writeln (v[i].edad);
+		end;
+	writeln('****************************************')
+
+end;
+
+procedure eliminarParticipantes (var v: vector; dimL: integer);
+var i, posicion: integer; cant: integer;
+begin
+	i:=0;
+{recorro hasta encontrar las posiciones con edades de 20 y 22}
+	while (i<= dimL) and (v[i].edad<20) do i:= i+1;
+	posicion:= i;
+
+	while (i<= dimL) and (v[i].edad<=22) do i:= i+1;
+	{ vamos a eliminar a todos los parcipantes entre las posiciones posicion e i del vector V }	
+	cant:= i-posicion;
+	for i:= (posicion + cant) to dimL do 
+		v[i-cant] := v[i];
+	  
+  dimL := dimL - cant;
+	  
+
+end;
+
+procedure agregarAtras(var L,ult : lista; p:participante);
+var 
+  aux : lista;
+begin
+  new(aux); 
+  aux^.dato := p;
+  aux^.sig := nil;
+  if (L = NIL) then L := aux
+			   else ult^.sig := aux;
+  ult := aux;
+end;
+
+procedure imprimirLista(L : lista);
+begin
+  while (L <> NIL) do 
+  begin
+	  writeln('Codigo: ',L^.dato.codigo,' - Edad: ',L^.dato.edad);
+	  L := L^.sig;
+  end;
+end;
+
+procedure crearLista (var l: lista; v: vector; dimL: integer);
+var
+	pri, ult: lista; i: integer;
+begin
+	for i:=1 to dimL do begin
+		agregarAtras (pri, ult, v[i])
+	end;
+end;
+
+
+var		
+	v: vector; dimL: integer; L: lista;
+
+begin
+	L:= nil;
+	inicializarVector (v);
+	cargarVector (v, dimL);
+	leerVector (v, dimL);
+	ordenarVector (v, dimL);
+	imprimirVector (v, dimL);
+	eliminarParticipantes (v, dimL);
+	imprimirVector (v, dimL);
+	crearLista (L, v, dimL);
+end.
