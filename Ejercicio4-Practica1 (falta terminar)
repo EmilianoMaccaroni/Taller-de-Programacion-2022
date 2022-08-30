@@ -1,0 +1,103 @@
+program E4P1;
+const
+	cant= 8;
+type
+	rango1= 1..cant;
+	producto= record
+		codigo: integer;
+		rubro: rango1;
+		precio: real;
+		end;
+	lista= ^nodo;
+	nodo= record
+		dato: producto;
+		sig: lista;
+		end;
+		
+	vectorR= array [rango1] of lista;
+	vec= array [1..30] of producto;
+	
+procedure iniciarListas (var v: vectorR);
+var i: rango1;
+begin
+	for i:=1 to cant do begin
+		v[i]:= nil;
+	end;
+end;
+
+procedure leerProducto (var p: producto);
+begin
+	writeln ('codigo: ');
+	readln (p.codigo);
+	if (p.codigo <> 0) then begin
+	writeln ('rubro: ');
+	readln (p.rubro);
+	writeln ('precio: ');
+	readln (p.precio);
+	end;
+end;
+
+procedure insertarOrdenado (var l: lista; p: producto);
+var nue, act, ant: lista;
+begin
+	new (nue); nue^.dato:=p; act:= l; ant:= l;
+	while (act <> nil) and (p.codigo < act^.dato.codigo) do begin
+		ant:= act;
+		act:= act^.sig;
+		end;
+	if (act = ant) then l:= nue
+	else begin
+		ant^.sig:=nue;
+		nue^.sig:= act;
+		end;
+end;
+
+procedure cargarListas (var v: vectorR);
+var p: producto;
+begin
+	leerProducto (p);
+	while (p.precio <> 0) do begin
+		insertarOrdenado (v[p.rubro], p);
+		leerProducto (p);
+		end;
+end;
+
+procedure leerLista (l: lista);
+begin
+	while (l <> nil) do begin
+		writeln (l^.dato.codigo);
+		writeln (l^.dato.rubro);
+		writeln (l^.dato.precio:2:2);
+		writeln ('-------------------');
+		l:=l^.sig;
+		end;
+end;
+
+procedure leerVectorRubros (v: vectorR);
+var i: rango1;
+begin
+	for i:=1 to cant do begin
+		leerLista (v[i]);
+		end;
+		writeln ('------------------')
+end;
+
+procedure vectorRubro3 (l: lista; var vectorcito: vec; var dimL: integer);
+begin
+	dimL:=0;
+	while (l<>nil) and (dimL<30) do begin
+		dimL:= dimL+1;
+		vectorcito [dimL]:= l^.dato;
+		l:= l^.sig;
+	end;
+end;
+var
+	v: vectorR; dimL: integer; vectorcito: vec;
+begin
+	iniciarListas (v);
+	cargarListas (v);
+	leerVectorRubros (v);
+	vectorRubro3 (v[3], vectorcito, dimL);
+	
+
+end.
