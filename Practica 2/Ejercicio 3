@@ -1,0 +1,112 @@
+{3.- Escribir un programa que:
+a. Implemente un módulo recursivo que genere una lista de números enteros “random” mayores a 0 y menores a 100. Finalizar con el número 0.
+b. Implemente un módulo recursivo que devuelva el mínimo valor de la lista. 
+c. Implemente un módulo recursivo que devuelva el máximo valor de la lista. 
+d. Implemente un módulo recursivo que devuelva verdadero si un valor determinado se encuentra en la lista o falso en caso contrario.}
+
+program E3P2;
+
+type
+	lista= ^nodo;
+	nodo= record
+		dato: integer;
+		sig: lista;
+		end;
+
+
+procedure generarNumeroAletorio (var n: integer);
+
+begin
+	n:= random (5); {numeros entre 0 y 99};
+	{writeln (n);}
+end;
+
+procedure agregarAdelante (var l: lista; n: integer);
+var nue: lista;
+begin
+	new(nue); nue^.dato:= n; nue^.sig:= nil;
+    if (l= nil) then l:= nue
+    else
+		begin
+			nue^.sig:=l;
+			l:= nue;
+		end;
+    
+end;
+
+procedure imprimirLista (l: lista); {imprimir lista recursivo}
+
+begin
+ if (l<>nil)then begin
+	writeln (l^.dato);
+	l:= l^.sig;
+	imprimirLista (l);
+	end;
+end;
+
+
+function minimo (l:lista; min:integer): integer;
+begin
+  if (l <> nil) then begin
+     min:= minimo (l^.sig,min);
+     if (l^.dato < min) then
+       min:= l^.dato;
+ end;
+   minimo:= min;
+end;
+
+function maximo (l:lista; max:integer): integer;
+begin
+  if (l <> nil) then begin
+     max:= maximo (l^.sig,max);
+     if (l^.dato > max) then
+       max:= l^.dato;
+ end;
+   maximo:= max;
+end;
+
+procedure cargarNumeros (var l: lista);
+var
+	n: integer;
+begin
+	generarNumeroAletorio (n);
+	if (n<>0) then begin
+			agregarAdelante (l,n);
+			cargarNumeros (l);
+	end;
+end;
+
+function seEncuentra (l: lista; n: integer): boolean;
+begin
+	if(l = nil) then
+		seEncuentra:= false    //caso base 1 - no lo encontre
+	else
+        if(l^.dato = n) then      //caso base 2 - encontre el elemento
+		   seEncuentra:= true
+		else begin
+			l:= l^.sig;
+			seEncuentra:= seEncuentra(l, n);
+		end;
+end;
+
+var l: lista;
+	Mini, min, Maxi, max, b: integer;
+	existe: boolean;
+begin
+	min:=9999;
+	max:=0;
+	cargarNumeros (l);
+	imprimirLista (l); {para ver si la carga esta bien}
+	Mini:= minimo (l,min);
+	writeln('----------------------------------');
+	writeln ('EL VALOR MINIMO EN LA LISTA ES: ', Mini);
+	writeln('----------------------------------');
+	Maxi:= maximo (l,max);
+	writeln ('EL VALOR MAXIMO EN LA LISTA ES: ', Maxi);
+	writeln('----------------------------------');
+	write ('INSERTAR EL VALOR QUE SE QUIERE BUSCAR: ');
+	read (b);
+	existe:= seencuentra (l,b);
+	writeln ('INDICAR SI EL ELEMENTO SE ENCUENTRA CON TRUE O FALSE: ');
+	write (existe);
+end.
